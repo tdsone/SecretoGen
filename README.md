@@ -17,7 +17,10 @@ The SecretoGen model architecture is defined in `src/pretraining/models/seq2seq.
 
 ### Computing perplexities
 
-The script `src/compute_perplexity.py` can score SecretoGen perplexities from tsv-formatted input data.
+The script `compute_perplexity.py` can score SecretoGen perplexities from csv-formatted input data. If `--checkpoint` is not specified, the script will automatically download the model weights and store them in `checkpoints/secretogen.pt`.
+
+```sh
+python3 compute_perplexity.py  --data data/efficiency_data/wu.csv --out_file test_run.csv
 
 
 ### Baseline perplexities

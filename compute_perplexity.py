@@ -1,9 +1,10 @@
 import torch
 import sys
 import pandas as pd
-from src.models.seq2seq_default import Seq2SeqTransformer
+from src.models.seq2seq import Seq2SeqTransformer
 from src.utils.dataset import PredictionSeq2SeqDataset
 from src.utils.alphabets import AA_TO_ID, CODON_TO_ID, CODON_TO_AA, DummyTaxonomyMapping
+from src.utils.download import download_checkpoint
 from tqdm.auto import tqdm
 import numpy as np
 import argparse
@@ -34,7 +35,6 @@ def load_model(weights, all_taxonomy_levels=True, codons=False):
 
 
 
-import torch
 def make_aa_logits_from_codon_logits(codon_logits: torch.Tensor, start_codon: str = 'ATG') -> torch.Tensor:
     '''
     Converts codon logits to amino acid logits.
@@ -174,37 +174,60 @@ def predict(model, loader, no_org=False, all_taxonomy_levels=True, translate_cod
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('checkpoint')
-    parser.add_argument('out_file')
-    parser.add_argument('--all_taxonomy_levels', action='store_true')
-    parser.add_argument('--no_prot', action='store_true')
-    parser.add_argument('--no_org', action='store_true')
-    parser.add_argument('--codons', action='store_true')
+    parser.add_argument('--data', type=str)
+    parser.add_argument('--out_file', type=str)
+    # these flags refer to ablation checkpoints from the paper,
+    # and are not used in the actual SecretoGen model.
+    # parser.add_argument('--all_taxonomy_levels', action='store_true')
+    # parser.add_argument('--no_prot', action='store_true')
+    # parser.add_argument('--no_org', action='store_true')
+    # parser.add_argument('--codons', action='store_true')
 
-    parser.add_argument('--data', type=str, default = 'data/fitness_data/grasso_prepared.csv')
     parser.add_argument('--taxonomy_dir', type=str, default = 'data/taxonomy_mappings')
+    parser.add_argument('--checkpoint', type=str, default = 'checkpoints/secretogen.pt')
+
 
     args = parser.parse_args()
 
-    model = load_model(args.checkpoint, args.all_taxonomy_levels, args.codons)
+    # if the checkpoint file doesn't exist, we download it to the parent dir of args.checkpoint
+    if not os.path.exists(args.checkpoint):
+        parent_dir = os.path.dirname(args.checkpoint)
+        download_checkpoint(parent_dir)
+
+    model = load_model(
+        args.checkpoint, 
+        all_taxonomy_levels=True,#args.all_taxonomy_levels, 
+        codons=False,#args.codons
+        )
     model.to(device)
 
 
     # 1. Test set
     levels_to_use = ['species', 'genus', 'family', 'order', 'class', 'phylum', 'kingdom', 'superkingdom']
-    test_set = PredictionSeq2SeqDataset(args.data, taxonomy_dir=args.taxonomy_dir, use_codons=args.codons, levels_to_use=levels_to_use)
+    test_set = PredictionSeq2SeqDataset(
+        args.data, 
+        taxonomy_dir=args.taxonomy_dir,
+        use_codons=False,#args.codons, 
+        levels_to_use=levels_to_use
+        )
     
-    if args.no_prot:
-        test_set.proteins = np.array([['<pad>']] * len(test_set))
+    # if args.no_prot:
+    #     test_set.proteins = np.array([['<pad>']] * len(test_set))
 
-    if args.no_org:
-        test_set.organisms = np.zeros_like(test_set.organisms, dtype=int)
-        test_set.taxonomy_labels = DummyTaxonomyMapping()
+    # if args.no_org:
+    #     test_set.organisms = np.zeros_like(test_set.organisms, dtype=int)
+    #     test_set.taxonomy_labels = DummyTaxonomyMapping()
 
 
 
     loader = torch.utils.data.DataLoader(test_set, collate_fn = test_set.collate_fn, batch_size=500)
-    perplexities = predict(model, loader, no_org = args.no_org, all_taxonomy_levels = args.all_taxonomy_levels, translate_codons=args.codons)
+    perplexities = predict(
+        model, 
+        loader, 
+        no_org = False,# args.no_org, 
+        all_taxonomy_levels = True, #args.all_taxonomy_levels, 
+        translate_codons= False,#args.codons
+        )
 
     df = test_set.df
     df['perplexity'] = perplexities

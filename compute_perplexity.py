@@ -119,7 +119,7 @@ def predict(model, loader, no_org=False, all_taxonomy_levels=True, translate_cod
 
             # default:
             sp_loss = torch.nn.functional.cross_entropy(aa_logits.reshape(-1, model.aa_vocab_size), sps_tgt.reshape(-1), reduction='mean', ignore_index=0)
-            print(np.exp(sp_loss.mean().item()))
+            # print(np.exp(sp_loss.mean().item()))
             for i in range(aa_logits.shape[1]):
 
                 if translate_codons:
@@ -144,7 +144,7 @@ def predict(model, loader, no_org=False, all_taxonomy_levels=True, translate_cod
                 # all_aa_logits.append(aa_logits[:, idx, :].detach().cpu())
                 # all_aa_targets.append(sps_tgt[:, idx].detach().cpu())
 
-            print(np.mean(ppl))
+            # print(np.mean(ppl))
 
     # ppl = []
     # if translate_codons:

@@ -17,16 +17,24 @@ The SecretoGen model architecture is defined in `src/pretraining/models/seq2seq.
 
 ### Computing perplexities
 
+SecretoGen requires `torch`, `pandas` and `tqdm`. You can install them with `pip install -r requirements.txt`.
+
 The script `compute_perplexity.py` can score SecretoGen perplexities from csv-formatted input data. If `--checkpoint` is not specified, the script will automatically download the model weights and store them in `checkpoints/secretogen.pt`.
 
 ```sh
 python3 compute_perplexity.py  --data data/efficiency_data/wu.csv --out_file test_run.csv
+```
 
+Note that as of torch version 2.2, a warning "enable_nested_tensor is True" will be printed. This flag was not available in the torch version used to train the model, and it should be safe to ignore the warning.
 
-### Baseline perplexities
+### Generating signal peptides
 
-`compute_perplexity_progen.py` and `compute_perplexity_spgen.py` work on the same input format.
-For SPGen, you will have to edit the checkpoint paths on lines 23 to 26. Checkpoints were prepared by extracting the state dicts from the checkpoints in the original SPGen repository, so that loading the checkpoint files does no longer depend on the SPGen directory structure for dependencies.
+The script `generate_sequences.py` can generate signal peptides using top-p sampling for a given mature protein sequence and host organism.
+
+This example generates 1000 SPs for a Xylanase in [*Bacillus subtilis* (1423)](https://www.uniprot.org/taxonomy/1423).
+```sh
+python3 generate_sequences.py test_samples.csv --org_id 1423 --seq "GSRTITNNEMGNHSGYDYELWKDYGNTSMTLNNGGAFSAGWNNIGNALFRKGKKFDSTRTHHQLGNISINYNASFNPGGNSYLCVYGWTQSPLAEYYIVDSWGTYRPTGAYKGSFYADGGTYDIYETTRVNQPSIIGIATFKQYWSVRQTKRTSGTVSVSAHFRKWESLGMPIGKMYETAFTVEGYQSSGSANVMTNQLFIGN" --top_p 0.75
+```
 
 
 ## Benchmark data
@@ -99,3 +107,9 @@ SecretoGen was evaluated on a set of studies that experimentally evaluated the s
     year = {2016},
     pages = {8745--8756},
     }
+
+
+### Baseline models
+
+`compute_perplexity_progen.py` and `compute_perplexity_spgen.py` work on the same input format.
+For SPGen, you will have to edit the checkpoint paths on lines 23 to 26. Checkpoints were prepared by extracting the state dicts from the checkpoints in the original SPGen repository, so that loading the checkpoint files does no longer depend on the SPGen directory structure for dependencies.

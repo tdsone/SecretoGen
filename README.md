@@ -6,10 +6,8 @@ A conditional autoregressive model of signal peptides. SecretoGen generates sign
 
 ## Resources
 
-The trained model weights are available at https://sid.erda.dk/cgi-sid/ls.py?share_id=e9OpPDduHg.
+The trained model weights are available at https://erda.ku.dk/archives/1a91453689c691c242f78268ff2fe1aa/published-archive.html. You don't have to download this manually, the scripts will automatically fetch the checkpoint.
 
-
-## Code
 
 ## Overview
 
@@ -109,7 +107,7 @@ SecretoGen was evaluated on a set of studies that experimentally evaluated the s
     }
 
 
-### Baseline models
+## Baseline methods
 
 `compute_perplexity_progen.py` and `compute_perplexity_spgen.py` work on the same input format.
 For SPGen, you will have to edit the checkpoint paths on lines 23 to 26. Checkpoints were prepared by extracting the state dicts from the checkpoints in the original SPGen repository, so that loading the checkpoint files does no longer depend on the SPGen directory structure for dependencies.

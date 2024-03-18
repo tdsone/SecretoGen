@@ -1,6 +1,6 @@
 import os
 
-checkpoint_url = 'https://sid.erda.dk/share_redirect/e9OpPDduHg/secretogen.pt'
+checkpoint_url = 'https://erda.ku.dk/archives/1a91453689c691c242f78268ff2fe1aa/SecretoGen/secretogen.pt'
 
 def download_checkpoint(destination_dir: str):
     """Download the secretogen checkpoint from ERDA."""

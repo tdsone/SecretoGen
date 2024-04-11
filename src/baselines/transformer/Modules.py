@@ -5,8 +5,10 @@ import numpy as np
 
 __author__ = "Yu-Hsiang Huang"
 
+
 class Linear(nn.Module):
-    ''' Simple Linear layer with xavier init '''
+    """Simple Linear layer with xavier init"""
+
     def __init__(self, d_in, d_out, bias=True):
         super(Linear, self).__init__()
         self.linear = nn.Linear(d_in, d_out, bias=bias)
@@ -15,26 +17,32 @@ class Linear(nn.Module):
     def forward(self, x):
         return self.linear(x)
 
+
 class Bottle(nn.Module):
-    ''' Perform the reshape routine before and after an operation '''
+    """Perform the reshape routine before and after an operation"""
 
     def forward(self, input):
         if len(input.size()) <= 2:
             return super(Bottle, self).forward(input)
         size = input.size()[:2]
-        out = super(Bottle, self).forward(input.reshape(size[0]*size[1], -1))
+        out = super(Bottle, self).forward(input.reshape(size[0] * size[1], -1))
         return out.view(size[0], size[1], -1)
 
+
 class BottleLinear(Bottle, Linear):
-    ''' Perform the reshape routine before and after a linear projection '''
+    """Perform the reshape routine before and after a linear projection"""
+
     pass
+
 
 class BottleSoftmax(Bottle, nn.Softmax):
-    ''' Perform the reshape routine before and after a softmax operation'''
+    """Perform the reshape routine before and after a softmax operation"""
+
     pass
 
+
 class LayerNormalization(nn.Module):
-    ''' Layer normalization module '''
+    """Layer normalization module"""
 
     def __init__(self, d_hid, eps=1e-3):
         super(LayerNormalization, self).__init__()
@@ -54,22 +62,26 @@ class LayerNormalization(nn.Module):
 
         return ln_out
 
+
 class BatchBottle(nn.Module):
-    ''' Perform the reshape routine before and after an operation '''
+    """Perform the reshape routine before and after an operation"""
 
     def forward(self, input):
         if len(input.size()) <= 2:
             return super(BatchBottle, self).forward(input)
         size = input.size()[1:]
-        out = super(BatchBottle, self).forward(input.view(-1, size[0]*size[1]))
+        out = super(BatchBottle, self).forward(input.view(-1, size[0] * size[1]))
         return out.view(-1, size[0], size[1])
 
+
 class BottleLayerNormalization(BatchBottle, LayerNormalization):
-    ''' Perform the reshape routine before and after a layer normalization'''
+    """Perform the reshape routine before and after a layer normalization"""
+
     pass
 
+
 class ScaledDotProductAttention(nn.Module):
-    ''' Scaled Dot-Product Attention '''
+    """Scaled Dot-Product Attention"""
 
     def __init__(self, d_model, attn_dropout=0.1):
         super(ScaledDotProductAttention, self).__init__()
@@ -83,12 +95,13 @@ class ScaledDotProductAttention(nn.Module):
 
         if attn_mask is not None:
 
-            assert attn_mask.size() == attn.size(), \
-                    'Attention mask shape {} mismatch ' \
-                    'with Attention logit tensor shape ' \
-                    '{}.'.format(attn_mask.size(), attn.size())
+            assert attn_mask.size() == attn.size(), (
+                "Attention mask shape {} mismatch "
+                "with Attention logit tensor shape "
+                "{}.".format(attn_mask.size(), attn.size())
+            )
 
-            attn.data.masked_fill_(attn_mask, -float('inf'))
+            attn.data.masked_fill_(attn_mask, -float("inf"))
 
         attn = self.softmax(attn)
         attn = self.dropout(attn)

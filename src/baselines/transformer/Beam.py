@@ -9,8 +9,9 @@ import torch
 import numpy as np
 from . import Constants
 
+
 class Beam(object):
-    ''' Store the neccesary info for beam search. '''
+    """Store the neccesary info for beam search."""
 
     def __init__(self, size, cuda=False):
 
@@ -50,8 +51,12 @@ class Beam(object):
 
         flat_beam_lk = beam_lk.view(-1)
 
-        best_scores, best_scores_id = flat_beam_lk.topk(self.size, 0, True, True) # 1st sort
-        best_scores, best_scores_id = flat_beam_lk.topk(self.size, 0, True, True) # 2nd sort
+        best_scores, best_scores_id = flat_beam_lk.topk(
+            self.size, 0, True, True
+        )  # 1st sort
+        best_scores, best_scores_id = flat_beam_lk.topk(
+            self.size, 0, True, True
+        )  # 2nd sort
 
         self.all_scores.append(self.scores)
         self.scores = best_scores
@@ -67,17 +72,17 @@ class Beam(object):
             self.done = True
             self.all_scores.append(self.scores)
 
-#         print('advance complete')
+        #         print('advance complete')
         return self.done
 
     def sort_scores(self):
         "Sort the scores."
         return torch.sort(self.scores, 0, True)
 
-#     def get_the_best_score_and_idx(self):
-#         "Get the score of the best in the beam."
-#         scores, ids = self.sort_scores()
-#         return scores[1], ids[1]
+    #     def get_the_best_score_and_idx(self):
+    #         "Get the score of the best in the beam."
+    #         scores, ids = self.sort_scores()
+    #         return scores[1], ids[1]
 
     def get_tentative_hypothesis(self):
         "Get the decoded sequence for the current timestep."
@@ -110,7 +115,7 @@ class Beam(object):
         hyp = []
         for j in range(len(self.prev_ks) - 1, -1, -1):
             print(j)
-            hyp.append(self.next_ys[j+1][k])
+            hyp.append(self.next_ys[j + 1][k])
             k = self.prev_ks[j][k]
 
         return hyp[::-1]

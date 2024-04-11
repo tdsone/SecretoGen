@@ -10,7 +10,17 @@ import numpy as np
 import argparse
 import os
 
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+# Pick first available device from list
+devices = [
+    [torch.cuda.is_available(), torch.device("cuda")],
+    [
+        torch.backends.mps.is_available(),
+        torch.device("mps"),
+    ],  # speedup over cpu for mac users with M1 chip
+    [True, torch.device("cpu")],
+]
+
+device = next(filter(lambda x: x[0], devices))[1]
 
 ID_TO_AA = {v: k for k, v in AA_TO_ID.items()}
 

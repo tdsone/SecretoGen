@@ -1,13 +1,10 @@
 # SecretoGen
 
-
 A conditional autoregressive model of signal peptides. SecretoGen generates signal peptides conditional on the mature protein sequence and the host organism.
-
 
 ## Resources
 
 The trained model weights are available at https://erda.ku.dk/archives/1a91453689c691c242f78268ff2fe1aa/published-archive.html. You don't have to download this manually, the scripts will automatically fetch the checkpoint.
-
 
 ## Overview
 
@@ -29,16 +26,19 @@ Note that as of torch version 2.2, a warning "enable_nested_tensor is True" will
 
 The script `generate_sequences.py` can generate signal peptides using top-p sampling for a given mature protein sequence and host organism.
 
-This example generates 1000 SPs for a Xylanase in [*Bacillus subtilis* (1423)](https://www.uniprot.org/taxonomy/1423).
+This example generates 1000 SPs for a Xylanase in [_Bacillus subtilis_ (1423)](https://www.uniprot.org/taxonomy/1423).
+
 ```sh
 python3 generate_sequences.py test_samples.csv --org_id 1423 --seq "GSRTITNNEMGNHSGYDYELWKDYGNTSMTLNNGGAFSAGWNNIGNALFRKGKKFDSTRTHHQLGNISINYNASFNPGGNSYLCVYGWTQSPLAEYYIVDSWGTYRPTGAYKGSFYADGGTYDIYETTRVNQPSIIGIATFKQYWSVRQTKRTSGTVSVSAHFRKWESLGMPIGKMYETAFTVEGYQSSGSANVMTNQLFIGN" --top_p 0.75
 ```
-
 
 ## Benchmark data
 
 SecretoGen was evaluated on a set of studies that experimentally evaluated the secretion efficiency of signal peptides. If you reuse the data, please cite the respective original works.
 
+## Development
+
+This repository is formatted via [black](https://github.com/psf/black). Run `black .` from the root of this repository to format all files.
 
 #### Grasso et al.
 
@@ -72,7 +72,6 @@ SecretoGen was evaluated on a set of studies that experimentally evaluated the s
     eprint = {https://doi.org/10.1021/acssynbio.0c00219}
     }
 
-
 #### Xue et al.
 
     @article{https://doi.org/10.1002/advs.202203433,
@@ -105,7 +104,6 @@ SecretoGen was evaluated on a set of studies that experimentally evaluated the s
     year = {2016},
     pages = {8745--8756},
     }
-
 
 ## Baseline methods
 
